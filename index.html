@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font: 16px Arial;  
+}
+
+/*the container must be positioned relative:*/
+.autocomplete {
+  position: relative;
+  display: inline-block;
+}
+
+input {
+  border: 1px solid transparent;
+  background-color: #f1f1f1;
+  padding: 10px;
+  font-size: 16px;
+}
+
+input[type=text] {
+  background-color: #f1f1f1;
+  width: 100%;
+}
+
+button {
+  background-color: #4CAF50; /* Green */
+  border: black;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-left: 16px;
+  margin-right: 16px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  transition-duration: 0.4s;
+}
+
+.button1 {
+  background-color: white; 
+  color: black; 
+  border: 2px solid #4CAF50;
+}
+
+.button1:hover {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.button2 {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff; 
+  border-bottom: 1px solid #d4d4d4; 
+}
+
+/*when hovering an item:*/
+.autocomplete-items div:hover {
+  background-color: #e9e9e9; 
+}
+
+/*when navigating through the items using the arrow keys:*/
+.autocomplete-active {
+  background-color: DodgerBlue !important; 
+  color: #ffffff; 
+}
+</style>
+</head>     
+<body>
+
+<h2>Autocomplete</h2>
+
+<p>Start typing:</p>
+
+<p>
+    <div class="autocomplete" style="width:300px;">
+      <input id="myInput" type="text" name="myAutoComplete" placeholder="Search">
+    </div>
+  <button id = "mySearchButton" class = "button button1">Search</button>
+</p>
+
+<button id = "mySubTypeButton" class = "button button1">Do Subtype Filtering</button>
+
+<p>
+  <div style="width:300px;">Results are : </div>
+  <p id = "myResulsParagraph" name = "mySearchResults" type = "text" style = "width:1000px;">
+  </p>
+</p>
+
+<p>
+  <div style="width:300px;">Filters are : </div>
+  <p id = "myFiltersParagraph" name = "myFiltersResults" type = "text" style = "width:1000px;">
+  </p>
+</p>
+
+<script src="src/servercall_autocomplete.js"></script>
+<script src="src/servercall_search.js"></script>
+<script src="src/FilteringUtils.js"></script>
+<script src="src/SearchQueryGenerators/SortingOrders.js"></script>
+<script src="src/ImportantFiles/autocompletemanager.js"></script>
+<script src="src/ImportantFiles/FilteringDisplay.js"></script>
+<script src="src/ImportantFiles/ResultsDisplay.js"></script>
+<script src="src/ImportantFiles/ResultsManager.js"></script>
+<script src="src/SearchQueryGenerators/SearchQueryGenerator.js"></script>
+<script src="src/SearchQueryGenerators/SearchQueryUtils.js"></script>
+<script src="src/SearchQueryGenerators/AutoCompleteQueryGenerator.js"></script>
+<script src="src/SearchQueryGenerators/FreeTextSearchQueryGenerator.js"></script>
+<script src="src/SearchQueryGenerators/SubTypeSearchQueryGenerator.js"></script>
+<script src="src/autocomplete.js"></script>
+<script src="src/textwidgets.js"></script>
+<script>
+    let resultsManager =  new ResultsManager();
+    let resultsDisplay = new ResultsDisplay(resultsManager, document.getElementById("myResulsParagraph"));
+    let filtersDisplay = new FilteringDisplay(resultsManager, document.getElementById("myFiltersParagraph"));
+    let autoCompleteManager = new AutoCompleteManager(resultsManager, 3 , 3);
+    /*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
+    let inp = document.getElementById("myInput");
+    document.addEventListener("click", function (e) {closeAllLists(e.target, inp);});
+    autocomplete(inp, autoCompleteManager);
+    let submitButton = document.getElementById("mySearchButton");
+    submitButton.addEventListener('click', function (e){
+          autoCompleteManager.onSearchButtonClicked(inp.value);
+    });
+    
+    // EXAMPLE FOR SUBTYPE FILTERING!! 
+    let subtypeFilteringButton = document.getElementById("mySubTypeButton");
+    subtypeFilteringButton.addEventListener('click', function(e){
+      let subtypeId = 3;// subtype id for coffee table.
+      let queryGenerator = new SubTypeSearchQueryGenerator(subtypeId);
+      resultsManager.setNewSearchQuery(queryGenerator); 
+    })
+</script>
+
+</body>
+</html>
